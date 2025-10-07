@@ -1,0 +1,47 @@
+# render.yaml
+
+services:
+  # 1. La base de datos Redis que actuará como broker de Celery
+  - type: redis
+    name: troncalnet-redis
+    ipAllowList: [] # Permite conexiones desde cualquier servicio dentro de tu cuenta de Render
+    plan: free # El plan gratuito es suficiente para empezar
+
+  # 2. El servidor web Flask (nuestro webhook)
+  - type: web
+    name: troncalnet-bot-web
+    env: python
+    plan: free # Puedes cambiarlo a un plan superior si necesitas más rendimiento
+    
+    # --- INICIO DEL CAMBIO ---
+    # Le decimos a Render que instale el paquete del sistema 'ffmpeg'
+    buildPackages:
+      - ffmpeg
+    # --- FIN DEL CAMBIO ---
+
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: troncalnet-redis
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11.4 # Asegúrate de que coincida con tu versión de desarrollo
+
+  # 3. El trabajador de Celery que procesa las tareas en segundo plano
+  - type: worker
+    name: troncalnet-bot-worker
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A tasks worker --loglevel=info"
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: troncalnet-redis
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11.4
