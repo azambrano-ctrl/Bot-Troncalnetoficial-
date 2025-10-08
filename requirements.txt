@@ -62,6 +62,8 @@ pydantic==2.11.7
 pydantic_core==2.33.2
 PyDrive2==1.21.3
 pydub==0.25.1
+pydub
+ffmpeg-python
 PyJWT==2.10.1
 PyMuPDF==1.26.4
 pyOpenSSL==24.2.1
