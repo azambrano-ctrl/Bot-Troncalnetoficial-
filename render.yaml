@@ -45,3 +45,11 @@ services:
           property: connectionString
       - key: PYTHON_VERSION
         value: 3.11.4
+
+services:
+  - type: web
+    name: troncalnet-bot-oficial
+    env: docker # ¡Esta es la línea clave! Le dice a Render que use tu Dockerfile.
+    autoDeploy: true
+    repo: https://github.com/azambrano-ctrl/Bot-Troncalnetoficial-.git
+    branch: main
