@@ -4,7 +4,6 @@ import requests
 import json
 import traceback
 from io import BytesIO
-from pydub import AudioSegment
 from google.cloud import speech
 from .utils import validate_image_quality, generate_temp_filename, save_temp_image # Asumiremos que moverás estas a un utils.py más tarde
 

@@ -15,7 +15,6 @@ from PIL import Image
 import imagehash
 from google.cloud import vision
 from google.cloud import speech
-from pydub import AudioSegment
 from flask import Flask, request
 from dotenv import load_dotenv
 from utils_sheets import registrar_pago, obtener_hashes_existentes
@@ -638,4 +637,5 @@ if __name__ == "__main__":
     cleanup_temp_files()
     port = int(os.environ.get("PORT", 5000))
     print(f"🚀 Servidor iniciado en el puerto {port}...")
+
     serve(app, host="0.0.0.0", port=port)
