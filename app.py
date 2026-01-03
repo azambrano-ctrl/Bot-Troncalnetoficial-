@@ -596,7 +596,18 @@ def whatsapp_webhook():
 
         elif paso == "awaiting_support_description":
             if command_text and len(command_text) > 10:
+                # ✅ NUEVO: Verificar si ya se envió un ticket para esta conversación
+                if state.get("ticket_enviado"):
+                    mensaje_ya_enviado = "✅ Tu reporte ya fue registrado anteriormente. Nuestro equipo se pondrá en contacto contigo pronto.\n\n¿Necesitas reportar algo diferente? Escribe 'menú' para volver al inicio."
+                    enviar_mensaje_whatsapp(from_number, mensaje_ya_enviado)
+                    return "OK", 200
+                
                 notificar_grupo_soporte(cliente_id=from_number, nombre_cliente=state.get("apellidos_y_nombres"), tipo_problema=state.get("problem_type"), telefono_contacto=state.get("support_phone"), mensaje_cliente=command_text, cedula_cliente=state.get("cedula"))
+                
+                # ✅ NUEVO: Marcar que el ticket ya fue enviado
+                state["ticket_enviado"] = True
+                guardar_estado(from_number, state)
+                
                 mensaje_confirmacion = (f"✅ **¡Reporte registrado exitosamente!**\n\n"
                                         f"👤 **Titular:** {state.get('apellidos_y_nombres', '').title()}\n"
                                         f"🚀 Nuestro equipo técnico revisará tu caso y se pondrá en contacto contigo.")
