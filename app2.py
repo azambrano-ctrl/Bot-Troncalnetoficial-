@@ -929,12 +929,22 @@ def whatsapp_webhook():
                     enviar_mensaje_whatsapp(from_number, mensaje_error)
                     return "OK", 200
                 
+                # ✅ NUEVO: Verificar si ya se envió un ticket para esta conversación
+                if state.get("ticket_enviado"):
+                    mensaje_ya_enviado = "✅ Tu reporte ya fue registrado anteriormente. Nuestro equipo se pondrá en contacto contigo pronto.\n\n¿Necesitas reportar algo diferente? Escribe 'menú' para volver al inicio."
+                    enviar_mensaje_whatsapp(from_number, mensaje_ya_enviado)
+                    return "OK", 200
+                
                 nombre_titular = state.get("apellidos_y_nombres", "No proporcionado")
                 cedula_titular = state.get("cedula", "No proporcionado")
                 telefono_contacto = state.get("support_phone", from_number)
                 problem_type_from_state = state.get("problem_type", "Reporte General")
                 
                 notificar_grupo_soporte(cliente_id=from_number, nombre_cliente=nombre_titular, tipo_problema=problem_type_from_state, telefono_contacto=telefono_contacto, mensaje_cliente=descripcion_problema, cedula_cliente=cedula_titular)
+
+                # ✅ NUEVO: Marcar que el ticket ya fue enviado
+                state["ticket_enviado"] = True
+                guardar_estado(from_number, state)
 
                 mensaje_confirmacion = (f"✅ **¡Reporte registrado exitosamente!**\n\n"
                                         f"👤 **Titular:** {nombre_titular.title()}\n"
